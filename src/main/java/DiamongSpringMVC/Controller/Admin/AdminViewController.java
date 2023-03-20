@@ -67,5 +67,60 @@ public class AdminViewController {
 		request.getSession().removeAttribute("useradmin");
 		return new ModelAndView("/admin/login");
 	}
+	  @GetMapping("/manager_category")
+  public ModelAndView get() {
+    ModelAndView mv = new ModelAndView("admin/manager_category");
+    mv.addObject("cates", categoryRepository.findAll());
+    return mv;
+  }
+
+  @GetMapping("/manager_category/delete/{id}")
+  public String get(@PathVariable Long id) {
+    categoryRepository.deleteById(id);
+    return "redirect:/admin/manager_category";
+  }
+
+  @GetMapping("/update_category/{id}/{name}")
+  public ModelAndView get(@PathVariable Long id, @PathVariable String name) {
+    ModelAndView mv = new ModelAndView("admin/update_category");
+    mv.addObject("cate", categoryRepository.findByIdAndName(id, name));
+    return mv;
+  }
+
+  @GetMapping("/category/add")
+  public ModelAndView cateegoryAdd() {
+    return new ModelAndView("admin/insert_category");
+  }
+
+
+  @PostMapping("/manager_category")
+  public String post(@RequestParam String command, @RequestParam(required = false) Long id, @RequestParam String cateName, Model m) {
+
+    String url = "", error = "";
+    if (StringUtils.isEmpty(cateName)) {
+      error = "Vui lòng nhập tên danh mục!";
+      m.addAttribute("error", error);
+    }
+
+    try {
+      if (error.length() == 0) {
+        switch (command) {
+        case "insert":
+          categoryRepository.save(new Category(cateName));
+          url = "/admin/manager_category";
+          break;
+        case "update":
+          categoryRepository.save(new Category(id, cateName));
+          url = "/admin/manager_category";
+          break;
+        }
+      } else {
+        url = "/admin/insert_category";
+      }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    return "redirect:"+url;
+  }
 
 }
