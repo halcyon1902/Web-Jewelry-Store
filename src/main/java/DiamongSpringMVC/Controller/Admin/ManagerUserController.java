@@ -36,6 +36,17 @@ public class ManagerUserController {
               session.setAttribute("user", users);
               url = "shop/homepage";
               break;
+
+          case "login":
+              users = userRepository.findByUserEmailAndUserPassAndGroupid(email, password, customer_group);
+              if (users != null) {
+                  session.setAttribute("user", users);
+                  url = "shop/homepage";
+              } else {
+                  session.setAttribute("error", "Email hoặc mật khẩu không đúng.!");
+                  url = "shop/login";
+              }
+              break;
       }
       return "redirect:/" + url;
   }
